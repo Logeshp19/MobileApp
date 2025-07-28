@@ -2,12 +2,11 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-
 import Screens from '../Account/Tabscreens/Screens';
 import Settings from '../Account/Tabscreens/Settings';
 import Contact from '../Account/Tabscreens/Contact';
 import About from '../Account/Tabscreens/About';
-import { View, TextInput, View as RNView } from 'react-native';
+import { View, ImageBackground,TextInput, View as RNView } from 'react-native';
 import CustomDrawerContent from './CustomDrawerContent';
 
 const Tab = createBottomTabNavigator();
@@ -22,7 +21,7 @@ const TabNavigation = () => {
       borderBottomRightRadius: 15,borderTopLeftRadius:15,borderBottomLeftRadius:15,
       overflow: 'hidden', },
   headerStyle: { 
-    backgroundColor: "#f1f1f1", 
+    backgroundColor: "#7630be", 
     elevation: 0, 
     shadowOpacity: 0,      
     borderBottomWidth: 0,  
@@ -39,7 +38,7 @@ const TabNavigation = () => {
        <View
     style={{
       flexDirection: 'row',
-      backgroundColor: '#ffffff',
+      backgroundColor: '#ffffffff',
       borderRadius: 10,
       paddingHorizontal: 8,
       height: 40,
@@ -58,11 +57,8 @@ const TabNavigation = () => {
           placeholder="Search for Number, Products"
           placeholderTextColor="#666"
           style={{
-            flex: 1,
             fontSize: 12,
             color: '#000',
-            paddingVertical: 10,
-            paddingHorizontal: 10,
             marginLeft:5
           }}
         />
@@ -72,8 +68,11 @@ const TabNavigation = () => {
   })}
 >
         {() => (
-          <View style={{ flex: 1 ,marginBottom:5}}>
-            <Tab.Navigator
+    <ImageBackground
+      source={require('../assets/theme/main.jpg')}
+      style={{ flex: 1, resizeMode: 'cover' }}
+    >
+  <Tab.Navigator
               screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
                   let iconName;
@@ -88,15 +87,15 @@ const TabNavigation = () => {
                   }
                   return <FontAwesome name={iconName} size={size} color={color} />;
                 },
-                tabBarActiveTintColor: '#de9762',
-                tabBarInactiveTintColor: '#ccc',
+                tabBarActiveTintColor: 'red',
+                tabBarInactiveTintColor: 'black',
                 tabBarStyle: {
                   backgroundColor: '#ffffff',
                   height: 50,
                   width: "88%",
                   alignSelf: "center",
                   borderRadius: 30,
-                  marginBottom: '5%',
+                  marginBottom: '3%',
                   marginTop: 2,
                 },
                 tabBarLabelStyle: { fontSize: 12, fontStyle: 'italic',marginLeft:10 },
@@ -123,7 +122,7 @@ const TabNavigation = () => {
                 options={{ headerShown: false }}
               />
             </Tab.Navigator>
-          </View>
+    </ImageBackground>
         )}
       </Drawer.Screen>
     </Drawer.Navigator>

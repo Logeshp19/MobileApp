@@ -114,6 +114,7 @@ dependencies {
     implementation project(':react-native-vector-icons')
     implementation platform('com.google.firebase:firebase-bom:34.0.0')
     implementation 'com.google.firebase:firebase-analytics'
+   implementation project(':react-native-pager-view')
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")

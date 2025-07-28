@@ -1,6 +1,6 @@
 import { takeLatest } from "redux-saga/effects";
 import actionType from "../actionTypes";
-
+import postAunthendicationEmployeeSaga from "./postAuthendication.saga";
 
 import postMpinEmployeeSaga from "./postMpinEmployee.saga";
 import postLoginEmployeeSaga from "./postLoginEmployee.Saga";
@@ -27,6 +27,13 @@ import postIntegrationAdjustmentEntrySaga from "./postIntegrationAdjustmentEntry
 
 export default function* (){
    
+
+   yield takeLatest(actionType.POST_AUTHENDICATION_EMPLOYEE_REQUEST,postAunthendicationEmployeeSaga)
+
+
+
+
+
     yield takeLatest(actionType.POST_MPIN_EMPLOYEE_REQUEST,postMpinEmployeeSaga)
     yield takeLatest(actionType.POST_LOGIN_EMPLOYEE_REQUEST,postLoginEmployeeSaga)  
     yield takeLatest(actionType.GET_EVENT_LISTING_REQUEST,getEventListingSaga)

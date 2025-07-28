@@ -4,7 +4,6 @@ import actionTypes from "../actionTypes";
 
 function* postSetMpinSaga(action) {
     console.log("Saga triggered with action:", action.payload);
-
     try {
         const { token, mPin, geoLocation, paramStr } = action.payload;
         console.log("token, mPin, geoLocation, paramStr ",token, mPin, geoLocation, paramStr )

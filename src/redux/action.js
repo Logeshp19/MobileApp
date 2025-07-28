@@ -1,5 +1,8 @@
 import actionTypes from "./actionTypes";
 
+export const postAuthendication = (params, id) => ({ type: actionTypes.POST_AUTHENDICATION_EMPLOYEE_REQUEST, payload: { params, id } });
+
+
 export const postLogin = (params, id) => ({ type: actionTypes.POST_LOGIN_EMPLOYEE_REQUEST, payload: { params, id } });
 
 export const postMpin = (token, mPin, geoLocation, paramStr) => ({

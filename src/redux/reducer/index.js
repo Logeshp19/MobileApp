@@ -1,4 +1,8 @@
 import { combineReducers } from "redux";
+
+import postAunthendicationEmployeeReducer from "./postAunthendication.Reducer";
+
+
 import postMpinEmployeeReducer from "./postMpinEmployee.Reducer";
 import postLoginEmployeeReducer from "./postLoginEmployee.Reducer";
 import getEventListingReducer from "./getEventListing.Reducer";
@@ -22,6 +26,8 @@ import postIntegrationLoadDataForBodyWytEntryReducer from "./postIntegrationLoad
 import postIntegrationAdjustmentEntryReducer from "./postIntegrationAdjustmentEntry.Reducer";
 
 const reducer =combineReducers({
+
+postAunthendicationEmployeeReducer , 
 
     
 postLoginEmployeeReducer,

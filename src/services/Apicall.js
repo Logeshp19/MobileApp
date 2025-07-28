@@ -1,9 +1,14 @@
 // Apicall.js
 import axios from 'axios';
 
-export const baseUrl = "https://test-api.crgroups.in";
+export const baseUrl = "https://testserver.biztechnovations.com";
 
 export const API = {
+    
+    authendication:"/web/session/authenticate",
+
+
+
     empLogin: "/api/account/login",
     empMpin: "/api/account/mpinlogin",
     empSetMpin: "/api/account/setmpin",
