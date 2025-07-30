@@ -1,74 +1,79 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Platform, PermissionsAndroid, NativeModules, } from 'react-native';
-import auth from '@react-native-firebase/auth';
-import RNSimData from 'react-native-sim-data';
+import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Platform, PermissionsAndroid, NativeModules, Alert, Linking } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { postAuthendication } from '../../redux/action';
+import Geolocation from 'react-native-geolocation-service';
+import RNAndroidLocationEnabler from 'react-native-android-location-enabler';
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+
 
 const Login = ({ navigation }) => {
-
   const dispatch = useDispatch();
   const [phone, setPhone] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
   const [pin, setPin] = useState(['', '', '', '', '', '']);
   const [keyboardShown, setKeyboardShown] = useState(false);
-  const [confirm, setConfirm] = useState(null);
-  const [otpSent, setOtpSent] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(false);
+  const [location, setLocation] = useState(null);
   const pinInputs = useRef([]);
-
-  const {postAunthendicationEmployeeLoading,postAunthendicationEmployeeData,postAunthendicationEmployeeError,postAunthendicationEmployeeErrorInvalid} = useSelector(state => state.postAunthendicationEmployeeReducer);
-console.log("data2",postAunthendicationEmployeeLoading,postAunthendicationEmployeeData,postAunthendicationEmployeeError)
-
-useEffect(() => {
-  if (!otpSent) return;
-
-  const hasResult = postAunthendicationEmployeeData?.result;
-
-  if (hasResult && !postAunthendicationEmployeeError && !postAunthendicationEmployeeErrorInvalid) {
-    const result = postAunthendicationEmployeeData.result.uid;
-    if (result) {
-      console.log('✅ API login success, UID:', result);
-      navigation.navigate('TabNavigation');
-    } else {
-      console.warn('⚠️ UID not found in response');
-      alert('Login failed: invalid user data');
-    }
-  } else if (postAunthendicationEmployeeError || postAunthendicationEmployeeErrorInvalid) {
-    console.warn('❌ API login error');
-    alert('Login failed: Invalid username or password');
-  }
-}, [
-  postAunthendicationEmployeeData,
-  postAunthendicationEmployeeError,
-  postAunthendicationEmployeeErrorInvalid,
-  otpSent
-]);
+  const { postAunthendicationEmployeeLoading, postAunthendicationEmployeeData, postAunthendicationEmployeeError, postAunthendicationEmployeeErrorInvalid } = useSelector(state => state.postAunthendicationEmployeeReducer);
 
   useEffect(() => {
-    if (phone.length === 10 && !otpSent) {
-      const fullPhoneNumber = `+91${phone}`;
-      console.log('Sending OTP to', fullPhoneNumber);
-      auth()
-        .signInWithPhoneNumber(fullPhoneNumber)
-        .then((confirmation) => {
-          setConfirm(confirmation);
-          setOtpSent(true);
-          console.log('OTP sent successfully');
-        })
-        .catch((error) => {
-          console.error('Failed to send OTP:', error);
-          alert('Failed to send OTP. Please try again.');
-        });
+    if (postAunthendicationEmployeeLoading) return;
+    const uid = postAunthendicationEmployeeData?.result?.uid;
+    const errorMsg = postAunthendicationEmployeeData?.error?.message;
+    if (uid) {
+      Alert.alert('Login successful!');
+      navigation.navigate('TabNavigation');
+    } else if (errorMsg || !uid) {
+      Alert.alert('Login Failed', 'Invalid username or password');
+      setPin(['', '', '', '', '', '']);
+      pinInputs.current[0]?.focus();
     }
-  }, [phone]);
-
+  }, [
+    postAunthendicationEmployeeLoading,
+    postAunthendicationEmployeeData,
+    postAunthendicationEmployeeError,
+    postAunthendicationEmployeeErrorInvalid,
+  ]);
 
   useEffect(() => {
     if (mobileNumber && !phone) {
       setPhone(mobileNumber);
     }
   }, [mobileNumber]);
+
+
+
+  const enableGPS = () => {
+    RNAndroidLocationEnabler.promptForEnableLocationIfNeeded({
+      interval: 10000,
+      fastInterval: 5000,
+    })
+      .then(() => {
+        getCurrentLocation();
+      })
+      .catch((err) => {
+        Alert.alert('Location Error', 'Please enable location services.');
+      });
+  };
+
+  const getCurrentLocation = () => {
+    Geolocation.getCurrentPosition(
+      (position) => {
+        setLocation(position);
+      },
+      (error) => {
+        Alert.alert('Error getting location', error.message);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 10000,
+      },
+    );
+  };
+
+
 
   useEffect(() => {
     const fetchSimNumber = async () => {
@@ -88,7 +93,6 @@ useEffect(() => {
         }
       }
     };
-
     fetchSimNumber();
   }, []);
 
@@ -96,7 +100,7 @@ useEffect(() => {
     const { SimInfo } = NativeModules;
     try {
       const numbers = await SimInfo.getSimNumbers();
-      return JSON.parse(numbers); 
+      return JSON.parse(numbers);
     } catch (error) {
       console.error('Error fetching SIM numbers:', error);
       return [];
@@ -137,39 +141,29 @@ useEffect(() => {
       pinInputs.current[index + 1].focus();
     }
   };
+  const requestLocationPermission = async () => {
+  const result = await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
+  if (result === RESULTS.GRANTED) return true;
 
-const handleLogin = async () => {
-  const code = pin.join('');
-  if (code.length !== 6 || !confirm) {
-    alert('Invalid OTP');
-    return;
-  }
-  try {
-    setIsVerifying(true);
-    await confirm.confirm(code);
-    alert('OTP verified');
-
-    const loginPayload = {
-      jsonrpc: "2.0",
-      params: {
-        db: "bisco_risco", 
-        login: phone,         
-        password: code         
-      }
-    };
-
-    dispatch(postAuthendication(loginPayload));
-    navigation.navigate('TabNavigation');
-
-  } catch (error) {
-    console.error('OTP verification failed', error);
-    alert('Incorrect OTP. Try again.');
-    setPin(['', '', '', '', '', '']);
-    pinInputs.current[0].focus();
-  } finally {
-    setIsVerifying(false);
-  }
+  const ask = await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
+  return ask === RESULTS.GRANTED;
 };
+  const handleLogin = async () => {
+    const code = pin.join('');
+    if (code.length !== 6) {
+      Alert.alert('Validation', 'Invalid OTP');
+      return;
+    }
+    const loginPayload = {
+      jsonrpc: '2.0',
+      params: {
+        db: 'bisco_risco',
+        login: phone,
+        password: code,
+      },
+    };
+    dispatch(postAuthendication(loginPayload));
+  };
 
   const isLoginEnabled = pin.every((digit) => digit !== '');
   return (
@@ -179,7 +173,6 @@ const handleLogin = async () => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <View style={styles.container}>
-          {/* Header */}
           <View style={styles.topRow}>
             <View>
               <Text style={styles.loginText}>Login Account</Text>
@@ -189,9 +182,7 @@ const handleLogin = async () => {
               <Image source={require('../../assets/user.png')} style={styles.avatar} />
             </View>
           </View>
-          {/* Image */}
           <Image source={require('../../assets/girlimages.png')} style={styles.centerImage} />
-          {/* Phone Input */}
           <Text style={styles.label}>Phone no..</Text>
           <View style={styles.phoneInputContainer}>
             <View style={styles.flagContainer}>
@@ -208,8 +199,6 @@ const handleLogin = async () => {
               onChangeText={(text) => {
                 const cleaned = text.replace(/[^0-9]/g, '');
                 setPhone(cleaned);
-                setOtpSent(false);
-                setConfirm(null);
               }}
             />
             {phone.length === 10 && (
@@ -224,13 +213,13 @@ const handleLogin = async () => {
                 ref={(el) => (pinInputs.current[index] = el)}
                 style={[
                   styles.pinInput,
-                  !otpSent && { backgroundColor: '#cacacaff' },
+                  { backgroundColor: '#ffffffff' },
                 ]}
                 maxLength={1}
                 keyboardType="numeric"
                 value={pin[index]}
-                onChangeText={(text) => otpSent && handlePinChange(text, index)}
-                editable={otpSent}
+                onChangeText={(text) => handlePinChange(text, index)}
+                editable={true}
               />
             ))}
           </View>
@@ -242,9 +231,9 @@ const handleLogin = async () => {
                 backgroundColor: isLoginEnabled ? '#e22727ff' : '#ccc',
               },
             ]}
-            disabled={!isLoginEnabled || isVerifying}>
+            disabled={!isLoginEnabled}>
             <Text style={styles.loginButtonText}>
-              {isVerifying ? 'Verifying...' : 'Verify OTP'}
+              Submit
             </Text>
           </TouchableOpacity>
         </View>
@@ -252,7 +241,7 @@ const handleLogin = async () => {
     </TouchableWithoutFeedback>
   );
 };
-
+export default Login;
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
@@ -378,4 +367,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Login;
+

@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import PagerView from 'react-native-pager-view';
-import FastImage from 'react-native-fast-image';
 
 const PagerContent = ({ currentTab }) => {
   switch (currentTab) {
@@ -90,7 +89,7 @@ const Screens = () => {
               {...props}
               indicatorStyle={{ backgroundColor: 'white' }}
               scrollEnabled
-              style={{ backgroundColor: '#45006f', borderRadius: 20 }}
+              style={{ backgroundColor:'#7630be', borderRadius: 10 }}
               renderLabel={({ route, focused }) => (
                 <Text style={{ color: focused ? 'black' : 'gray', fontWeight: 'bold' }}>
                   {route.title.toUpperCase()}
