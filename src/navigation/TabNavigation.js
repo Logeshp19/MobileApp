@@ -39,35 +39,16 @@ const TabNavigation = () => {
         >
           <Text style={styles.cardText}>Create Customer</Text>
         </Pressable>
-        <Pressable
-          style={styles.card}
-          onPress={() => {
-            setModalVisible(false);
-            navigation.navigate('ExistingCustomer');
-          }}
-        >
-          <Text style={styles.cardText}>Existing Customer</Text>
-        </Pressable>
       </View>
-
       <View style={styles.row}>
         <Pressable
           style={styles.card}
           onPress={() => {
             setModalVisible(false);
-            navigation.navigate('CreateCustomer'); // Update if needed
+            navigation.navigate('CreateVisit');
           }}
         >
           <Text style={styles.cardText}>Create Visit</Text>
-        </Pressable>
-        <Pressable
-          style={styles.card}
-          onPress={() => {
-            setModalVisible(false);
-            navigation.navigate('CreateCustomer'); // Update if needed
-          }}
-        >
-          <Text style={styles.cardText}>Existing Visit</Text>
         </Pressable>
       </View>
 
@@ -250,7 +231,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%',
+    width: '70%',
     marginBottom: 15,
   },
   card: {
